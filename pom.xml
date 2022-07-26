@@ -49,6 +49,18 @@
 			<version>1.2.2</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-salesforce-connector</artifactId>
+			<version>10.15.2</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>			
+		<dependency>
+			<groupId>com.mulesoft.modules</groupId>
+			<artifactId>mule-secure-configuration-property-module</artifactId>
+			<classifier>mule-plugin</classifier>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

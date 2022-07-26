@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="salesforceFlow" doc:id="8415d6a7-2ceb-4c79-b430-726b7b41f58b" >
+		<http:listener doc:name="Listener" doc:id="d3b365d9-94d9-4d68-a77e-1d6d46999330" config-ref="HTTP_Listener_config" path="sf/getuserinfo"/>
+		<salesforce:get-user-info doc:name="Get user info" doc:id="5eebcf31-9e75-47bb-a80f-1c6717b46071" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="c318a9af-5a67-42de-b3bc-7bb9dd786fb9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7a3390bc-7b7c-42c7-b5f9-db18efecbdbd" message='Payload of SFDC - Get User Info: #[payload]'/>
+	</flow>
+</mule>
