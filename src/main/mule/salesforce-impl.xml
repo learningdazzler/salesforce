@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-	<flow name="salesforceFlow" doc:id="8415d6a7-2ceb-4c79-b430-726b7b41f58b" >
+	<flow name="salesforce-impl-getUserInfoFlow" doc:id="8415d6a7-2ceb-4c79-b430-726b7b41f58b" >
 		<http:listener doc:name="Listener" doc:id="d3b365d9-94d9-4d68-a77e-1d6d46999330" config-ref="HTTP_Listener_config" path="sf/getuserinfo"/>
 		<salesforce:get-user-info doc:name="Get user info" doc:id="5eebcf31-9e75-47bb-a80f-1c6717b46071" config-ref="Salesforce_Config"/>
 		<ee:transform doc:name="Transform Message" doc:id="c318a9af-5a67-42de-b3bc-7bb9dd786fb9" >
@@ -20,5 +21,98 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="7a3390bc-7b7c-42c7-b5f9-db18efecbdbd" message='Payload of SFDC - Get User Info: #[payload]'/>
+	</flow>
+	<flow name="salesforce-impl-queryFlow" doc:id="d9d853f5-ac7a-404a-8362-c6c4bb911c93" >
+		<http:listener doc:name="Listener" doc:id="d5eff5af-dd91-43a3-b07e-64c480634714" config-ref="HTTP_Listener_config" path="sf/retrieve"/>
+		<salesforce:query doc:name="Rahul" doc:id="522f6ae6-1a3a-4061-a33f-06679f8561b6" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select name__c,age__c from rahul__c]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="3c8a0b8b-45ce-49af-a4eb-15a0ca8eecb1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="27df35ab-e3bd-4a7c-8eb2-286bdc366b69" message="retrive response: #[payload]"/>
+	</flow>
+	<flow name="salesforce-impl-createFlow" doc:id="72044c2f-d7cf-4513-963c-6ad56e17b5f0" >
+		<http:listener doc:name="Listener" doc:id="f08f1ff0-9d8b-46ea-bb8d-e6f5d2f1a7a7" config-ref="HTTP_Listener_config" path="sf/create" />
+		<ee:transform doc:name="Transform Message" doc:id="2632188f-56b9-4fe0-bd29-804436c32563" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+ [{
+        "age__c": "67.0",
+        "name__c": "kaku",
+        "Id": null,
+        "type": "Rahul__c"
+    }]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="a36375f9-73e4-4047-8ad2-1f41c0f0fe9b" config-ref="Salesforce_Config" type="Rahul__c"/>
+		<ee:transform doc:name="Transform Message" doc:id="130e5bf6-68b7-4e49-959d-8feba871154a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5d37b701-3b48-4144-8525-7380943fef1d" message="create response: #[payload]"/>
+	</flow>
+	<flow name="salesforce-implFlowNOT-WORKING" doc:id="430261af-77d3-4302-b406-e055fdf31203" >
+		<http:listener doc:name="Listener" doc:id="4284e53b-7010-4233-a3c2-bcf20cec4380" config-ref="HTTP_Listener_config" path="sf/delete" />
+		<ee:transform doc:name="Transform Message" doc:id="4b0ea958-b31a-43c9-9156-4e101607adb9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+ [{
+        "age__c": "67.0",
+        "name__c": "kaku",
+        "Id": null,
+        "type": "Rahul__c"
+    }]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="NOT WORKING" doc:id="b148db8f-a3a6-4cb6-83f1-a84112f97429" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="e6620dbf-e528-4ee1-94a3-4f2555950c14" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d251a613-6dbf-4b33-894d-88a728cb2a30" message="Delete response: #[payload]"/>
+	</flow>
+	<flow name="salesforce-implFlow" doc:id="e1020640-9bcc-4a25-b8bb-834bf3cbd969" >
+		<http:listener doc:name="Listener" doc:id="4ce84f83-e889-41f2-ad74-da8655b2d08b" config-ref="HTTP_Listener_config" path="sf/findduplicates" />
+		<ee:transform doc:name="Transform Message" doc:id="f04faeae-7c2e-4edf-92b1-bca6ec371e87" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+ [{
+        "age__c": "67.0",
+        "name__c": "kaku",
+        "Id": null,
+        "type": "Rahul__c"
+    }]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:find-duplicates type="Rahuls" doc:name="Rahul" doc:id="4d85b671-edc2-4b5e-b6d2-8e6964d35687" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="ac37a2fe-6818-4b74-8f2b-e064cd0b51af" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bd1699cf-d156-410b-aa47-35916a21eda2" message="find duplicates response: #[payload]" />
 	</flow>
 </mule>
